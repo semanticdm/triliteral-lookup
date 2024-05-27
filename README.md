@@ -1,5 +1,5 @@
-# Mantine Next Template
+## Next.js App Router Course - Starter
 
-Get started with the template by clicking `Use this template` button on the top of the page.
+This is the starter template for the Next.js App Router Course. It contains the starting code for the dashboard application.
 
-[Documentation](https://mantine.dev/guides/next/)
+For more information, see the [course curriculum](https://nextjs.org/learn) on the Next.js Website.
