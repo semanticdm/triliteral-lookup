@@ -4,6 +4,8 @@ import { z } from 'zod';
 import { sql } from '@vercel/postgres';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { signIn } from '@/auth';
+import { AuthError } from 'next-auth';
 
 const FormSchema = z.object({
   id: z.string(),
@@ -56,4 +58,83 @@ export async function updateInvoice(id: string, formData: FormData) {
 export async function deleteInvoice(id: string) {
   await sql`DELETE FROM invoices WHERE id = ${id}`;
   revalidatePath('/dashboard/invoices');
+}
+
+export async function authenticate(
+  prevState: string | undefined,
+  formData: FormData,
+) {
+  try {
+    await signIn('credentials', formData);
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case 'CredentialsSignin':
+          return 'Invalid credentials.';
+        default:
+          return 'Something went wrong.';
+      }
+    }
+    throw error;
+  }
+}
+
+export async function getAvailableRoots(
+  root1: string | null,
+  root2: string | null,
+  root3: string | null,
+) {
+  if (!root1) {
+    return [
+      { id: 1, value: 'alef', text: '\u05d0' },
+      { id: 2, value: 'bet', text: '\u05d1' },
+      { id: 3, value: 'gimel', text: '\u05d2' },
+      { id: 4, value: 'dalet', text: '\u05d3' },
+      { id: 5, value: 'he', text: '\u05d4' },
+      { id: 6, value: 'vav', text: '\u05d5' },
+      { id: 7, value: 'zayin', text: '\u05d6' },
+      { id: 8, value: 'het', text: '\u05d7' },
+      { id: 9, value: 'tet', text: '\u05d8' },
+      { id: 10, value: 'yost', text: '\u05d9' },
+    ];
+  }
+  if (!root2) {
+    if (root1 === 'alef') {
+      return [
+        { id: 1, value: 'alef', text: '\u05d0' },
+        { id: 2, value: 'bet', text: '\u05d1' },
+        { id: 3, value: 'gimel', text: '\u05d2' },
+        { id: 4, value: 'dalet', text: '\u05d3' },
+        { id: 5, value: 'he', text: '\u05d4' },
+      ];
+    }
+  } else if (root1 === 'bet') {
+    return [
+      { id: 5, value: 'he', text: '\u05d4' },
+      { id: 6, value: 'vav', text: '\u05d5' },
+      { id: 7, value: 'zayin', text: '\u05d6' },
+      { id: 8, value: 'het', text: '\u05d7' },
+      { id: 9, value: 'tet', text: '\u05d8' },
+    ];
+  } else {
+    return [];
+  }
+  if (!root3) {
+    if (root2 === 'alef') {
+      return [
+        { id: 7, value: 'zayin', text: '\u05d6' },
+        { id: 8, value: 'het', text: '\u05d7' },
+        { id: 9, value: 'tet', text: '\u05d8' },
+      ];
+    } else if (root2 === 'he') {
+      [
+        { id: 2, value: 'bet', text: '\u05d1' },
+        { id: 3, value: 'gimel', text: '\u05d2' },
+        { id: 4, value: 'dalet', text: '\u05d3' },
+      ];
+    } else {
+      return [];
+    }
+  }
+  return [];
 }
