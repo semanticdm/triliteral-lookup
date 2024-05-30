@@ -80,10 +80,13 @@ export async function authenticate(
 }
 
 export async function getAvailableRoots(
-  root1: string | null,
-  root2: string | null,
-  root3: string | null,
+  root1?: string | null,
+  root2?: string | null,
+  root3?: string | null,
 ) {
+  console.log('TCB Root1: ' + root1);
+  console.log('TCB Root2: ' + root2);
+  console.log('TCB Root3: ' + root3);
   if (!root1) {
     return [
       { id: 1, value: 'alef', text: '\u05d0' },

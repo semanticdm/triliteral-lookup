@@ -1,54 +1,124 @@
 'use client';
 
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { getAvailableRoots } from '../lib/actions';
 
+interface CharacterOption {
+  value: string;
+  text: string;
+}
 export default function CharacterLookup() {
+  const searchParams = useSearchParams();
+  const [selectedValues, setSelectedValues] = useState({
+    root1: '',
+    root2: '',
+    root3: '',
+    root4: '',
+  });
+  const [firstOptions, setFirstOptions] = useState<Array<CharacterOption>>([]);
+  const [secondOptions, setsecondOptions] = useState<Array<CharacterOption>>(
+    [],
+  );
+  const [thirdOptions, setthirdOptions] = useState<Array<CharacterOption>>([]);
+  const [fourthOptions, setfourthOptions] = useState<Array<CharacterOption>>(
+    [],
+  );
+
+  if (firstOptions.length === 0) {
+    const root1 = searchParams.get('root1');
+    const root2 = searchParams.get('root2');
+    const root3 = searchParams.get('root3');
+    getAvailableRoots().then((values) => {
+      setFirstOptions(values);
+    });
+    getAvailableRoots(root1).then((values) => {
+      setsecondOptions(values);
+    });
+    getAvailableRoots(root1, root2).then((values) => {
+      setthirdOptions(values);
+    });
+    getAvailableRoots(root1, root2, root3).then((values) => {
+      setfourthOptions(values);
+    });
+  }
+  const updateParams = async (root: string, value: string) => {
+    if (root === 'root1') {
+      getAvailableRoots(value).then((values) => {
+        setsecondOptions(values);
+      });
+    }
+    getAvailableRoots(selectedValues.root1).then((values) => {
+      setsecondOptions(values);
+    });
+  };
+  return (
+    <>
+      <RootDropDown
+        id="root4"
+        options={fourthOptions}
+        label="Fourth Root"
+        onChangea={updateParams}
+      />
+      <RootDropDown
+        id="root3"
+        options={thirdOptions}
+        label="Third Root"
+        onChangea={updateParams}
+      />
+      <RootDropDown
+        id="root2"
+        options={secondOptions}
+        label="Second Root"
+        onChangea={updateParams}
+      />
+      <RootDropDown
+        id="root1"
+        options={firstOptions}
+        label="First Root"
+        onChangea={updateParams}
+      />
+    </>
+  );
+}
+
+export function RootDropDown({
+  id,
+  options,
+  label,
+  onChangea,
+}: {
+  id: string;
+  options: CharacterOption[];
+  label: string;
+  onChangea: (root: string, value: string) => void;
+}) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
-
+  const params = new URLSearchParams(searchParams);
   const onChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    //    alert(event.target.value + ' ' + event.target.name);
-    const params = new URLSearchParams(searchParams);
     if (event.target.value) {
       params.set(event.target.name, event.target.value);
     } else {
       params.delete(event.target.name);
     }
     replace(`${pathname}?${params.toString()}`);
+    onChangea(event.target.name, event.target.value);
   };
-  const characters = [
-    { value: 'alef', text: '\u05d0' },
-    { value: 'bet', text: '\u05d1' },
-    { value: 'gimel', text: '\u05d2' },
-  ];
   return (
     <>
-      <label>Fourth Root</label>
-      <select id="root4" name="root4" onChange={onChange}>
-        {characters.map((char) => (
-          <option key={char.value} value={char.value}>
+      <label>{label}</label>
+      <select id={id} name={id} onChange={onChange}>
+        {options.map((char) => (
+          <option
+            key={char.value}
+            value={char.value}
+            selected={char.value === params.get(id)}
+          >
             {char.text}
           </option>
         ))}
-      </select>
-      <label>Third Root</label>
-      <select id="root3" name="root3" onChange={onChange}>
-        <option value="alef">&#x5d0;</option>
-        <option value="bet">&#x5d1;</option>
-        <option value="gimel">&#x5d2;</option>
-      </select>
-      <label>Second Root</label>
-      <select id="root2" name="root2" onChange={onChange}>
-        <option value="alef">&#x5d0;</option>
-        <option value="bet">&#x5d1;</option>
-        <option value="gimel">&#x5d2;</option>
-      </select>
-      <label>First Root</label>
-      <select id="root1" name="root1" onChange={onChange}>
-        <option value="alef">&#x5d0;</option>
-        <option value="bet">&#x5d1;</option>
-        <option value="gimel">&#x5d2;</option>
       </select>
     </>
   );
