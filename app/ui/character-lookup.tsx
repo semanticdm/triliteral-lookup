@@ -46,11 +46,26 @@ export default function CharacterLookup() {
     if (root === 'root1') {
       getAvailableRoots(value).then((values) => {
         setsecondOptions(values);
+        selectedValues.root1 = value;
+        setSelectedValues(selectedValues);
       });
     }
-    getAvailableRoots(selectedValues.root1).then((values) => {
-      setsecondOptions(values);
-    });
+    if (root === 'root2') {
+      getAvailableRoots(selectedValues.root1, value).then((values) => {
+        setthirdOptions(values);
+        selectedValues.root2 = value;
+        setSelectedValues(selectedValues);
+      });
+    }
+    if (root === 'root3') {
+      getAvailableRoots(selectedValues.root1, selectedValues.root2, value).then(
+        (values) => {
+          setfourthOptions(values);
+          selectedValues.root3 = value;
+          setSelectedValues(selectedValues);
+        },
+      );
+    }
   };
   return (
     <>
