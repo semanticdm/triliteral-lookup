@@ -1,8 +1,10 @@
 'use client';
 
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { getAvailableRoots } from '../lib/actions';
+import { Button } from './button';
+import Link from 'next/link';
 
 interface CharacterOption {
   value: string;
@@ -24,6 +26,10 @@ export default function CharacterLookup() {
   const [fourthOptions, setfourthOptions] = useState<Array<CharacterOption>>(
     [],
   );
+
+  const onClick = () => {
+
+  }
 
   if (firstOptions.length === 0) {
     const root1 = searchParams.get('root1');
@@ -69,30 +75,32 @@ export default function CharacterLookup() {
   };
   return (
     <>
-      <RootDropDown
-        id="root4"
-        options={fourthOptions}
-        label="Fourth Root"
-        onChangea={updateParams}
-      />
-      <RootDropDown
-        id="root3"
-        options={thirdOptions}
-        label="Third Root"
-        onChangea={updateParams}
-      />
-      <RootDropDown
-        id="root2"
-        options={secondOptions}
-        label="Second Root"
-        onChangea={updateParams}
-      />
-      <RootDropDown
-        id="root1"
-        options={firstOptions}
-        label="First Root"
-        onChangea={updateParams}
-      />
+      <div>
+        <RootDropDown
+          id="root4"
+          options={fourthOptions}
+          label="Fourth Root"
+          onChangea={updateParams}
+        />
+        <RootDropDown
+          id="root3"
+          options={thirdOptions}
+          label="Third Root"
+          onChangea={updateParams}
+        />
+        <RootDropDown
+          id="root2"
+          options={secondOptions}
+          label="Second Root"
+          onChangea={updateParams}
+        />
+        <RootDropDown
+          id="root1"
+          options={firstOptions}
+          label="First Root"
+          onChangea={updateParams}
+        /></div>
+      <div><Button><Link href={"lookup/" + selectedValues.root1 + (selectedValues.root2 ? "/" + selectedValues.root2 + (selectedValues.root3 ? "/" + selectedValues.root3 + (selectedValues.root4 ? "/" + selectedValues.root4 : "") : "") : "")}>Search</Link></Button></div>
     </>
   );
 }
